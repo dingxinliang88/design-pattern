@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+
+spring:
+  # H2
+  datasource:
+    url: jdbc:h2:mem:design
+    driver-class-name: org.h2.Driver
+    username: design
+    password: design
+  h2:
+    console:
+      enabled: true
+      path: /my-h2
+
+  # JPA
+  jpa:
+    properties:
+      hibernate:
+        # auto update
+        hbm2ddl:
+          auto: update
+      # config MySQL5 InnoDB Dialect
+      dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+
+
+
