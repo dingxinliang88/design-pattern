@@ -3,6 +3,9 @@ server:
 
 
 spring:
+  config:
+    import:
+      - 'classpath:/config/gitee.properties'
   # H2
   datasource:
     url: jdbc:h2:mem:design
@@ -26,4 +29,13 @@ spring:
     show-sql: true
 
 
-
+# 第三方登录相关配置
+gitee:
+  client-id: ${third_party.gitee.client_id}
+  client-secret: ${third_party.gitee.client_secret}
+  callback: ${third_party.gitee.callback}
+  state: ${third_party.gitee.state}
+  user:
+    prefix: ${gitee.state}@
+    url: https://gitee.com/api/v5/user?access_token=%s
+  token-url: https://gitee.com/oauth/token?grant_type=authorization_code&client_id=${gitee.client-id}&client_secret=${gitee.client-secret}&redirect_uri=${gitee.callback}&code=%s
