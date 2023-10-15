@@ -1,23 +1,26 @@
-package com.juzi.design.pattern.adapter;
+package com.juzi.design.pattern.bridge.function;
 
 import cn.hutool.json.JSONObject;
+import com.juzi.design.pattern.bridge.abst.factory.RegisterLoginComponentFactory;
 import com.juzi.design.pojo.UserInfo;
-import com.juzi.design.service.UserService;
+import com.juzi.design.repo.UserRepository;
 import com.juzi.design.utils.HttpClientUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 /**
- * 第三方登录适配器类
- * 通过继承 被适配角色 UserSer
+ * Bridge - ConcreteImplementor
  *
  * @author codejuzi
  */
 @Component
-public class Login3rdAdapter extends UserService implements Login3rdTarget {
+public class RegisterLoginByGitee extends AbstractRegisterLoginFunc implements RegisterLoginFuncInterface {
 
     @Value("${gitee.state}")
     private String giteeState;
@@ -37,11 +40,22 @@ public class Login3rdAdapter extends UserService implements Login3rdTarget {
     @Value("${gitee.user.prefix}")
     private String giteeUserPrefix;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostConstruct
+    public void initFuncMap() {
+        RegisterLoginComponentFactory.FUNC_MAP.put("GITEE", this);
+    }
+
+
     /**
-     * <a href="https://gitee.com/oauth/authorize?client_id=%s&redirect_uri=http://localhost:8081/login/gitee&response_type=code&state=GITEE">get code</a>
+     * <a href="https://gitee.com/oauth/authorize?client_id=%s&redirect_uri=http://localhost:8081/bridge/login/gitee&response_type=code&state=GITEE">get code</a>
      */
     @Override
-    public String loginByGitee(String code, String state) {
+    public String login3rd(HttpServletRequest request) {
+        String code = request.getParameter("code");
+        String state = request.getParameter("state");
         // 判断state
         if (!giteeState.equals(state)) {
             throw new RuntimeException("Invalid state");
@@ -64,8 +78,8 @@ public class Login3rdAdapter extends UserService implements Login3rdTarget {
 
     private String autoRegister3rdAndLogin(String username, String password) {
         // 如果已经使用第三方登录过，直接登录
-        if (checkUserExists(username)) {
-            return login(username, password);
+        if (super.commonCheckUserExists(username, userRepository)) {
+            return super.commonLogin(username, password, userRepository);
         }
 
         // 组装用户信息
@@ -75,18 +89,10 @@ public class Login3rdAdapter extends UserService implements Login3rdTarget {
         userInfo.setCreateDate(LocalDateTime.now());
 
         // 如果是第一次使用第三方登录，先注册
-        register(userInfo);
+        super.commonRegister(userInfo, userRepository);
         // 再登录
-        return login(username, password);
+        return super.commonLogin(username, password, userRepository);
     }
 
-    @Override
-    public String loginByQQ(String... params) {
-        return null;
-    }
 
-    @Override
-    public String loginByWechat(String... params) {
-        return null;
-    }
 }
