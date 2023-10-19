@@ -5,13 +5,15 @@ server:
 spring:
   config:
     import:
-      - 'classpath:/config/gitee.properties'
+      - 'classpath:/conf/gitee.properties'
   # H2
   datasource:
     url: jdbc:h2:mem:design
     driver-class-name: org.h2.Driver
     username: design
     password: design
+    schema: 'classpath:/h2/schema.sql'
+    data: 'classpath:/h2/data.sql'
   h2:
     console:
       enabled: true
@@ -28,6 +30,11 @@ spring:
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     show-sql: true
 
+  # Redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 3
 
 # 第三方登录相关配置
 gitee:
