@@ -1,11 +1,10 @@
 package com.juzi.design.controller;
 
 import com.juzi.design.pattern.composite.ProductComposite;
+import com.juzi.design.pojo.ProductItem;
 import com.juzi.design.service.ProductItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author codejuzi
@@ -21,4 +20,15 @@ public class ProductItemController {
     public ProductComposite queryAllItems() {
         return productItemService.queryAllItems();
     }
+
+    @PostMapping("/add")
+    public ProductComposite addItem(@RequestBody ProductItem item) {
+        return productItemService.addItem(item);
+    }
+
+    @PostMapping("/del")
+    public ProductComposite delItem(@RequestBody ProductItem item) {
+        return productItemService.delItem(item);
+    }
+
 }

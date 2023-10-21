@@ -1,10 +1,7 @@
 package com.juzi.design.pattern.composite;
 
 import com.juzi.design.pojo.ProductItem;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +10,7 @@ import java.util.List;
 /**
  * @author codejuzi
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,12 +23,12 @@ public class ProductComposite extends AbstractProductItem {
     private List<AbstractProductItem> children = new ArrayList<>();
 
     @Override
-    protected void addProductItem(AbstractProductItem item) {
+    public void addProductItem(AbstractProductItem item) {
         this.children.add(item);
     }
 
     @Override
-    protected void delProductItem(AbstractProductItem item) {
+    public void delProductItem(AbstractProductItem item) {
         ProductComposite removeItem = (ProductComposite) item;
         Iterator<AbstractProductItem> iterator = children.iterator();
         while (iterator.hasNext()) {
