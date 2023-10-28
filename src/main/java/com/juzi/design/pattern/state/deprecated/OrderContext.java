@@ -1,5 +1,6 @@
 package com.juzi.design.pattern.state.deprecated;
 
+import com.juzi.design.pojo.OrderV1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,23 +27,23 @@ public class OrderContext {
     @Autowired
     private ReceiveOrder receiveOrder;
 
-    public Order createOrder(String orderId, String productId) {
+    public OrderV1 createOrder(String orderId, String productId) {
         // this.currentState = createOrder;
         // return currentState.createOrder(orderId, productId, this);
         return createOrder.createOrder(orderId, productId, this);
     }
 
-    public Order payOrder(String orderId) {
+    public OrderV1 payOrder(String orderId) {
         // return currentState.payOrder(orderId, this);
         return payOrder.payOrder(orderId, this);
     }
 
-    public Order sendOrder(String orderId) {
+    public OrderV1 sendOrder(String orderId) {
         // return currentState.sendOrder(orderId, this);
         return sendOrder.sendOrder(orderId, this);
     }
 
-    public Order receiveOrder(String orderId) {
+    public OrderV1 receiveOrder(String orderId) {
         // return currentState.receiveOrder(orderId, this);
         return receiveOrder.receiveOrder(orderId, this);
     }

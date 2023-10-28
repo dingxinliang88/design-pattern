@@ -1,7 +1,7 @@
 package com.juzi.design.controller;
 
-import com.juzi.design.pojo.OrderV1;
-import com.juzi.design.service.OrderServiceV1;
+import com.juzi.design.pojo.Order;
+import com.juzi.design.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,31 +11,31 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author codejuzi
  */
-@Deprecated
-@RequestMapping("/v1/order")
 @RestController
-public class OrderControllerV1 {
+@RequestMapping("/order")
+public class OrderController {
 
     @Autowired
-    private OrderServiceV1 orderService;
+    private OrderService orderService;
 
     @PostMapping("/create")
-    public OrderV1 createOrder(@RequestParam(value = "product_id") String productId) {
+    public Order createOrder(@RequestParam(value = "product_id") String productId) {
         return orderService.createOrder(productId);
     }
 
     @PostMapping("/pay")
-    public OrderV1 payOrder(@RequestParam(value = "order_id") String orderId) {
+    public Order payOrder(@RequestParam(value = "order_id") String orderId) {
         return orderService.payOrder(orderId);
     }
 
     @PostMapping("/send")
-    public OrderV1 send(@RequestParam(value = "order_id") String orderId) {
+    public Order send(@RequestParam(value = "order_id") String orderId) {
         return orderService.send(orderId);
     }
 
     @PostMapping("/receive")
-    public OrderV1 receive(@RequestParam(value = "order_id") String orderId) {
+    public Order receive(@RequestParam(value = "order_id") String orderId) {
         return orderService.receive(orderId);
     }
+
 }
