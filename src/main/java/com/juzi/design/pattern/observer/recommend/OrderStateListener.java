@@ -1,5 +1,7 @@
 package com.juzi.design.pattern.observer.recommend;
 
+import com.juzi.design.pattern.command.OrderCommand;
+import com.juzi.design.pattern.command.OrderCommandInvoker;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
 import com.juzi.design.pojo.Order;
@@ -22,6 +24,9 @@ public class OrderStateListener {
     @Autowired
     private RedisCommonProcessor redisCommonProcessor;
 
+    @Autowired
+    private OrderCommand orderCommand;
+
     @OnTransition(source = {"ORDER_WAIT_PAY"}, target = {"ORDER_WAIT_SEND"})
     public boolean pay2Send(Message<OrderStateChangeAction> message) {
         // 获取订单，判断当前订单状态是否是待支付
@@ -35,7 +40,9 @@ public class OrderStateListener {
         order.setOrderState(OrderState.ORDER_WAIT_SEND);
         redisCommonProcessor.set(order.getOrderId(), order);
 
-        // todo 命令模式相关处理
+        // 命令模式相关处理
+        OrderCommandInvoker invoker = new OrderCommandInvoker();
+        invoker.invoke(orderCommand, order);
         return true;
     }
 
@@ -52,7 +59,9 @@ public class OrderStateListener {
         order.setOrderState(OrderState.ORDER_WAIT_RECEIVE);
         redisCommonProcessor.set(order.getOrderId(), order);
 
-        // todo 命令模式相关处理
+        // 命令模式相关处理
+        OrderCommandInvoker invoker = new OrderCommandInvoker();
+        invoker.invoke(orderCommand, order);
         return true;
     }
 
@@ -70,7 +79,9 @@ public class OrderStateListener {
         // 删除订单状态机
         redisCommonProcessor.remove(order.getOrderId() + "_STATE");
 
-        // todo 命令模式相关处理
+        // 命令模式相关处理
+        OrderCommandInvoker invoker = new OrderCommandInvoker();
+        invoker.invoke(orderCommand, order);
         return true;
     }
 

@@ -1,5 +1,7 @@
 package com.juzi.design.service;
 
+import com.juzi.design.pattern.command.OrderCommand;
+import com.juzi.design.pattern.command.OrderCommandInvoker;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
 import com.juzi.design.pojo.Order;
@@ -30,6 +32,9 @@ public class OrderService {
     @Autowired
     private RedisCommonProcessor redisCommonProcessor;
 
+    @Autowired
+    private OrderCommand orderCommand;
+
     public Order createOrder(String productId) {
         String orderId = "order_" + productId;
         Order order = Order.builder()
@@ -38,6 +43,11 @@ public class OrderService {
                 .orderState(OrderState.ORDER_WAIT_PAY)
                 .build();
         redisCommonProcessor.setExpiredMinutes(orderId, order, 15);
+
+        // 命令模式相关处理
+        // 特殊处理的原因：订单创建状态没有被Spring状态机管理
+        OrderCommandInvoker invoker = new OrderCommandInvoker();
+        invoker.invoke(orderCommand, order);
         return order;
     }
 
