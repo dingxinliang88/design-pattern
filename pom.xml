@@ -40,6 +40,13 @@
             <version>2.2.0.RELEASE</version>
         </dependency>
 
+        <!-- Ali Pay -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.34.0.ALL</version>
+        </dependency>
+
 
         <!-- JPA -->
         <dependency>

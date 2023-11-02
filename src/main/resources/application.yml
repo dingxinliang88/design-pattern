@@ -6,6 +6,7 @@ spring:
   config:
     import:
       - 'classpath:/conf/gitee.properties'
+      - 'classpath:/conf/pay.properties'
   # H2
   datasource:
     url: jdbc:h2:mem:design
@@ -46,3 +47,11 @@ gitee:
     prefix: ${gitee.state}@
     url: https://gitee.com/api/v5/user?access_token=%s
   token-url: https://gitee.com/oauth/token?grant_type=authorization_code&client_id=${gitee.client-id}&client_secret=${gitee.client-secret}&redirect_uri=${gitee.callback}&code=%s
+
+alipay:
+  app-id: ${third_party.alipay.app_id}
+  app-private-key: ${third_party.alipay.app_private_key}
+  alipay-public-key: ${third_party.alipay.alipay_public_key}
+  gateway-url: ${third_party.alipay.alipay_gateway_url}
+  callback-url: ${third_party.alipay.callback_url}
+  sign-type: ${third_party.alipay.sign_type}

@@ -1,5 +1,7 @@
 package com.juzi.design.service;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.juzi.design.pattern.command.OrderCommand;
 import com.juzi.design.pattern.command.OrderCommandInvoker;
 import com.juzi.design.pattern.state.recommend.OrderState;
@@ -9,11 +11,17 @@ import com.juzi.design.utils.RedisCommonProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author codejuzi
@@ -107,4 +115,37 @@ public class OrderService {
         return false;
     }
 
+    @Value("${alipay.alipay-public-key}")
+    private String alipayPublicKey;
+
+    @Value("${alipay.sign-type}")
+    private String signType;
+
+    public String alipayCallback(HttpServletRequest request) throws AlipayApiException {
+        // 获取回调信息
+        Map<String, String> params = new HashMap<>();
+        Map<String, String[]> paramsMap = request.getParameterMap();
+        for (Map.Entry<String, String[]> param : paramsMap.entrySet()) {
+            String name = param.getKey();
+            String[] values = param.getValue();
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+            }
+            valueStr = new String(valueStr.getBytes(StandardCharsets.UTF_8));
+            params.put(name, valueStr);
+        }
+        // 验证签名，确保回调接口是支付宝平台触发的
+        boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayPublicKey, "UTF-8", signType);
+        if (!signVerified) {
+            throw new AlipayApiException("Callback Verify Failed");
+        }
+
+        String outTradeNo = new String(request.getParameter("out_trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String tradeNo = new String(request.getParameter("trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        float totalAmount = Float.parseFloat(new String(request.getParameter("total_amount").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+        // 进行相关的业务操作
+        payOrder(outTradeNo);
+        return "支付成功页面跳转， 当前订单为" + outTradeNo;
+    }
 }

@@ -1,5 +1,6 @@
 package com.juzi.design.controller;
 
+import com.alipay.api.AlipayApiException;
 import com.juzi.design.pojo.Order;
 import com.juzi.design.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author codejuzi
@@ -36,6 +39,11 @@ public class OrderController {
     @PostMapping("/receive")
     public Order receive(@RequestParam(value = "order_id") String orderId) {
         return orderService.receive(orderId);
+    }
+
+    @RequestMapping("/alipay-callback")
+    public String alipayCallback(HttpServletRequest request) throws AlipayApiException {
+        return orderService.alipayCallback(request);
     }
 
 }
