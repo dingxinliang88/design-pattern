@@ -5,7 +5,10 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.juzi.design.pojo.Order;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * 支付宝支付策略类
@@ -13,23 +16,41 @@ import org.springframework.beans.factory.annotation.Value;
  * @author codejuzi
  */
 public class AliPayStrategy implements PayStrategyInterface {
-    @Value("${alipay.app-id}")
-    private String appId;
 
-    @Value("${alipay.app-private-key}")
-    private String appPrivateKey;
+    private static String appId;
+    private static String appPrivateKey;
+    private static String alipayPublicKey;
+    private static String gatewayUrl;
+    private static String callbackUrl;
+    private static String signType;
 
-    @Value("${alipay.alipay-public-key}")
-    private String alipayPublicKey;
+    static {
+        Properties props = new Properties();
+        InputStream input = null;
 
-    @Value("${alipay.gateway-url}")
-    private String gatewayUrl;
+        try {
+            input = AliPayStrategy.class.getResourceAsStream("/conf/pay.properties");
+            // load a properties file
+            props.load(input);
 
-    @Value("${alipay.callback-url")
-    private String callbackUrl;
-
-    @Value("${alipay.sign-type}")
-    private String signType;
+            appId = props.getProperty("third_party.alipay.app_id");
+            appPrivateKey = props.getProperty("third_party.alipay.app_private_key");
+            alipayPublicKey = props.getProperty("third_party.alipay.alipay_public_key");
+            gatewayUrl = props.getProperty("third_party.alipay.alipay_gateway_url");
+            callbackUrl = props.getProperty("third_party.alipay.callback_url");
+            signType = props.getProperty("third_party.alipay.sign_type");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 
     @Override
@@ -48,7 +69,7 @@ public class AliPayStrategy implements PayStrategyInterface {
 
         // 请求
         try {
-            return alipayClient.pageExecute(payRequest).getBody();
+            return alipayClient.pageExecute(payRequest, "GET").getBody();
         } catch (AlipayApiException e) {
             throw new RuntimeException("AliPay Failed!", e);
         }

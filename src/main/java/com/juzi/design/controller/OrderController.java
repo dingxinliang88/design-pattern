@@ -27,8 +27,10 @@ public class OrderController {
     }
 
     @PostMapping("/pay")
-    public Order payOrder(@RequestParam(value = "order_id") String orderId) {
-        return orderService.payOrder(orderId);
+    public String payOrder(@RequestParam(value = "order_id") String orderId,
+                           @RequestParam(value = "price") Float price,
+                           @RequestParam(value = "pay_type") Integer payType) {
+        return orderService.getPayUrl(orderId, price, payType);
     }
 
     @PostMapping("/send")
@@ -45,5 +47,6 @@ public class OrderController {
     public String alipayCallback(HttpServletRequest request) throws AlipayApiException {
         return orderService.alipayCallback(request);
     }
+
 
 }

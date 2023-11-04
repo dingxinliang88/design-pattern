@@ -4,6 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.juzi.design.pattern.command.OrderCommand;
 import com.juzi.design.pattern.command.OrderCommandInvoker;
+import com.juzi.design.pattern.facade.PayFacade;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
 import com.juzi.design.pojo.Order;
@@ -42,6 +43,9 @@ public class OrderService {
 
     @Autowired
     private OrderCommand orderCommand;
+
+    @Autowired
+    private PayFacade payFacade;
 
     public Order createOrder(String productId) {
         String orderId = "order_" + productId;
@@ -147,5 +151,11 @@ public class OrderService {
         // 进行相关的业务操作
         payOrder(outTradeNo);
         return "支付成功页面跳转， 当前订单为" + outTradeNo;
+    }
+
+    public String getPayUrl(String orderId, Float price, Integer payType) {
+        Order order = (Order) redisCommonProcessor.get(orderId);
+        order.setPrice(price);
+        return payFacade.pay(order, payType);
     }
 }
