@@ -10,6 +10,9 @@ public enum PayStrategyEnum {
     ALIPAY("com.juzi.design.pattern.strategy.AliPayStrategy"),
     WECHAT_PAY("com.juzi.design.pattern.strategy.WechatPayStrategy");
 
+    /**
+     * 策略类全类名
+     */
     final String val;
 
     PayStrategyEnum(String val) {

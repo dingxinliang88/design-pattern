@@ -1,9 +1,6 @@
 package com.juzi.design.pattern.facade;
 
 import com.juzi.design.pattern.factory.PayContextFactory;
-import com.juzi.design.pattern.strategy.AliPayStrategy;
-import com.juzi.design.pattern.strategy.PayContext;
-import com.juzi.design.pattern.strategy.WechatPayStrategy;
 import com.juzi.design.pojo.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

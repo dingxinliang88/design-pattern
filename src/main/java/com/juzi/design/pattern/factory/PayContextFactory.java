@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class PayContextFactory extends AbstractPayContextFactory<PayContext> {
 
+    /**
+     * 享元模式 => 减少重复对象造成的内存浪费情况
+     */
     private static final Map<String, PayContext> PAY_CONTEXT_MAP = new ConcurrentHashMap<>();
 
     @Override
