@@ -13,8 +13,8 @@ spring:
     driver-class-name: org.h2.Driver
     username: design
     password: design
-    schema: 'classpath:/h2/schema.sql'
-    data: 'classpath:/h2/data.sql'
+    schema: 'classpath:/schema.sql'
+    data: 'classpath:/data.sql'
   h2:
     console:
       enabled: true
@@ -36,6 +36,20 @@ spring:
     host: 127.0.0.1
     port: 6379
     database: 3
+
+# Apollo
+app:
+  id: DesignPatternLearning
+apollo:
+  meta: http://127.0.0.1:8080
+  bootstrap:
+    enable: true
+    eagerLoad:
+      enable: true
+  cacheDir: /Users/codejuzi/program/Apollo/apollo-quick-start-2.1.0/cache/apollo-cache
+logging:
+  level:
+    com: info
 
 # 第三方登录相关配置
 gitee:

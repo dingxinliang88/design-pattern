@@ -1,13 +1,13 @@
 package com.juzi.design.controller;
 
 import com.juzi.design.pattern.adapter.Login3rdAdapter;
+import com.juzi.design.pojo.BusinessLaunch;
 import com.juzi.design.pojo.UserInfo;
 import com.juzi.design.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author codejuzi
@@ -34,5 +34,12 @@ public class UserController {
     @GetMapping("/login/gitee")
     public String giteeLogin(String code, String state) {
         return login3rdAdapter.loginByGitee(code, state);
+    }
+
+    @PostMapping("/business/launch")
+    public List<BusinessLaunch> filterBusinessLaunch(@RequestParam("city") String city,
+                                                     @RequestParam("sex") String sex,
+                                                     @RequestParam("product") String product) {
+        return userService.filterBusinessLaunch(city, sex, product);
     }
 }

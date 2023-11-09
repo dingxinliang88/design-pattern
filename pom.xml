@@ -47,6 +47,13 @@
             <version>4.34.0.ALL</version>
         </dependency>
 
+        <!-- Apollo -->
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
 
         <!-- JPA -->
         <dependency>
