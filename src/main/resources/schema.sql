@@ -11,3 +11,9 @@ CREATE TABLE IF NOT EXISTS business_launch (
     target_sex VARCHAR(8),
     target_product VARCHAR(32)
 );
+
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    product_id VARCHAR(8) NOT NULL,
+    send_red_bag INT NOT NULL
+);

@@ -1,9 +1,11 @@
 package com.juzi.design.service;
 
+import cn.hutool.json.JSONUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.juzi.design.pattern.command.OrderCommand;
 import com.juzi.design.pattern.command.OrderCommandInvoker;
+import com.juzi.design.pattern.decorator.OrderServiceDecorator;
 import com.juzi.design.pattern.facade.PayFacade;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
@@ -28,7 +30,7 @@ import java.util.Map;
  * @author codejuzi
  */
 @Service
-public class OrderService {
+public class OrderService implements IOrderService {
 
     private final Logger logger = LoggerFactory.getLogger(OrderState.class);
 
@@ -47,6 +49,8 @@ public class OrderService {
     @Autowired
     private PayFacade payFacade;
 
+
+    @Override
     public Order createOrder(String productId) {
         String orderId = "order_" + productId;
         Order order = Order.builder()
@@ -63,8 +67,8 @@ public class OrderService {
         return order;
     }
 
-    // TODO 待修改，有雷区
-    public Order payOrder(String orderId) {
+    @Override
+    public Order pay(String orderId) {
         Order order = (Order) redisCommonProcessor.get(orderId);
         // 订单状态变更消息Message，附带订单操作PAY
         Message<OrderStateChangeAction> message = MessageBuilder
@@ -76,6 +80,7 @@ public class OrderService {
         return null;
     }
 
+    @Override
     public Order send(String orderId) {
         Order order = (Order) redisCommonProcessor.get(orderId);
         // 订单状态变更消息Message，附带订单操作SEND
@@ -88,6 +93,7 @@ public class OrderService {
         return null;
     }
 
+    @Override
     public Order receive(String orderId) {
         Order order = (Order) redisCommonProcessor.get(orderId);
         // 订单状态变更消息Message，附带订单操作RECEIVE
@@ -125,6 +131,13 @@ public class OrderService {
     @Value("${alipay.sign-type}")
     private String signType;
 
+    @Autowired
+    private OrderServiceDecorator orderServiceDecorator;
+
+    @Value("${service.level:0}")
+    private Integer serviceLevel;
+
+    @Override
     public String alipayCallback(HttpServletRequest request) throws AlipayApiException {
         // 获取回调信息
         Map<String, String> params = new HashMap<>();
@@ -149,10 +162,14 @@ public class OrderService {
         String tradeNo = new String(request.getParameter("trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
         float totalAmount = Float.parseFloat(new String(request.getParameter("total_amount").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
         // 进行相关的业务操作
-        payOrder(outTradeNo);
-        return "支付成功页面跳转， 当前订单为" + outTradeNo;
+//        Order order = pay(outTradeNo);
+        orderServiceDecorator.setOrderService(this);
+        Order order = orderServiceDecorator.decoratorPay(outTradeNo, serviceLevel, totalAmount);
+
+        return "支付成功页面跳转， 当前订单为:" + JSONUtil.toJsonStr(order);
     }
 
+    @Override
     public String getPayUrl(String orderId, Float price, Integer payType) {
         Order order = (Order) redisCommonProcessor.get(orderId);
         order.setPrice(price);

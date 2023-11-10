@@ -15,3 +15,7 @@ INSERT INTO business_launch(id, business_detail, target_city, target_sex, target
 (2, '某奢侈品投放业务', '', 'F', 'Female Bag'),
 (3, '北方某店投放业务', 'bj,tj', '', ''),
 (4, '平台优惠券', '', '', '');
+
+INSERT INTO products (id, product_id, send_red_bag) VALUES
+(1, '100', 0),
+(2, '101', 1);

@@ -37,6 +37,13 @@ spring:
     port: 6379
     database: 3
 
+  # RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 # Apollo
 app:
   id: DesignPatternLearning
