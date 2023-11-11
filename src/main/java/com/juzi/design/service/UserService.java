@@ -3,6 +3,7 @@ package com.juzi.design.service;
 import com.juzi.design.pattern.dutychain.AbstractBusinessHandler;
 import com.juzi.design.pattern.dutychain.CityHandler;
 import com.juzi.design.pattern.factory.ChainHandlerEnum;
+import com.juzi.design.pattern.proxy.DirectorProxy;
 import com.juzi.design.pojo.BusinessLaunch;
 import com.juzi.design.pojo.UserInfo;
 import com.juzi.design.repo.BusinessLaunchRepository;
@@ -32,7 +33,10 @@ public class UserService {
     @Autowired
     private BusinessLaunchRepository businessLaunchRepository;
 
-    @Value("${duty.chain}")
+    @Autowired
+    private DirectorProxy directorProxy;
+
+    @Value("${duty.chain:city,sex,product}")
     private String handlerType;
 
     // 当前责任链头节点配置
@@ -110,5 +114,9 @@ public class UserService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public Object createTicket(String type, String productId, String content, String title, String bankInfo, String taxId) {
+        return directorProxy.buildTicket(type, productId, content, title, bankInfo, taxId);
     }
 }

@@ -42,4 +42,15 @@ public class UserController {
                                                      @RequestParam("product") String product) {
         return userService.filterBusinessLaunch(city, sex, product);
     }
+
+    @PostMapping("/ticket")
+    public Object createTicket(@RequestParam("type") String type,
+                               @RequestParam("product_id") String productId,
+                               @RequestParam("content") String content,
+                               @RequestParam("title") String title,
+                               @RequestParam("bank_info") String bankInfo,
+                               @RequestParam("tax_id") String taxId) {
+        return userService.createTicket(type, productId, content, title, bankInfo, taxId);
+
+    }
 }
