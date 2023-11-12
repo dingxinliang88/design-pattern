@@ -7,6 +7,10 @@ import com.juzi.design.pattern.command.OrderCommand;
 import com.juzi.design.pattern.command.OrderCommandInvoker;
 import com.juzi.design.pattern.decorator.OrderServiceDecorator;
 import com.juzi.design.pattern.facade.PayFacade;
+import com.juzi.design.pattern.mediator.AbstractCustomer;
+import com.juzi.design.pattern.mediator.Buyer;
+import com.juzi.design.pattern.mediator.Mediator;
+import com.juzi.design.pattern.mediator.Payer;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
 import com.juzi.design.pojo.Order;
@@ -174,5 +178,27 @@ public class OrderService implements IOrderService {
         Order order = (Order) redisCommonProcessor.get(orderId);
         order.setPrice(price);
         return payFacade.pay(order, payType);
+    }
+
+
+    @Autowired
+    private Mediator mediator;
+
+    public void friendPay(String sourceCustomer, String orderId, String targetCustomer, String payResult, String role) {
+        // 创建中介者类
+        Buyer buyer = new Buyer(mediator, orderId, sourceCustomer);
+        Payer payer = new Payer(mediator, orderId, targetCustomer);
+        Map<String, AbstractCustomer> customerMap = new HashMap<>();
+        customerMap.put("buyer", buyer);
+        customerMap.put("payer", payer);
+        Mediator.customerInstances.put(orderId, customerMap);
+
+        // B - 发起朋友代付
+        // P - 朋友完成代付
+        if ("B".equals(role)) {
+            buyer.messageTransfer(orderId, targetCustomer, payResult);
+        } else if ("P".equals(role)) {
+            payer.messageTransfer(orderId, targetCustomer, payResult);
+        }
     }
 }

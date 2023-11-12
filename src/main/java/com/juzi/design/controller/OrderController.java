@@ -48,5 +48,10 @@ public class OrderController {
         return orderService.alipayCallback(request);
     }
 
+    @PostMapping("/friend-pay")
+    public void friendPay(String sourceCustomer, String orderId, String targetCustomer, String payResult, String role) {
+        orderService.friendPay(sourceCustomer, orderId, targetCustomer, payResult, role);
+    }
+
 
 }
