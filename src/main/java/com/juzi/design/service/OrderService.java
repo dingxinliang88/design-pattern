@@ -13,6 +13,10 @@ import com.juzi.design.pattern.mediator.Mediator;
 import com.juzi.design.pattern.mediator.Payer;
 import com.juzi.design.pattern.state.recommend.OrderState;
 import com.juzi.design.pattern.state.recommend.OrderStateChangeAction;
+import com.juzi.design.pattern.template.CreateOrderLog;
+import com.juzi.design.pattern.template.PayOrderLog;
+import com.juzi.design.pattern.template.ReceiveOrderLog;
+import com.juzi.design.pattern.template.SendOrderLog;
 import com.juzi.design.pojo.Order;
 import com.juzi.design.utils.RedisCommonProcessor;
 import org.slf4j.Logger;
@@ -53,6 +57,18 @@ public class OrderService implements IOrderService {
     @Autowired
     private PayFacade payFacade;
 
+    @Autowired
+    private CreateOrderLog createOrderLog;
+
+    @Autowired
+    private PayOrderLog payOrderLog;
+
+    @Autowired
+    private SendOrderLog sendOrderLog;
+
+    @Autowired
+    private ReceiveOrderLog receiveOrderLog;
+
 
     @Override
     public Order createOrder(String productId) {
@@ -68,6 +84,8 @@ public class OrderService implements IOrderService {
         // 特殊处理的原因：订单创建状态没有被Spring状态机管理
         OrderCommandInvoker invoker = new OrderCommandInvoker();
         invoker.invoke(orderCommand, order);
+        logger.info("日志信息: {}", createOrderLog.createAuditLog("CodeJuzi", "Create Order", orderId));
+
         return order;
     }
 
@@ -77,6 +95,8 @@ public class OrderService implements IOrderService {
         // 订单状态变更消息Message，附带订单操作PAY
         Message<OrderStateChangeAction> message = MessageBuilder
                 .withPayload(OrderStateChangeAction.PAY).setHeader("order", order).build();
+
+        logger.info("日志信息: {}", payOrderLog.createAuditLog("CodeJuzi", "Pay Order", orderId));
         // 发送 Message 给Spring状态机
         if (changeStateAction(message, order)) {
             return order;
@@ -90,6 +110,7 @@ public class OrderService implements IOrderService {
         // 订单状态变更消息Message，附带订单操作SEND
         Message<OrderStateChangeAction> message = MessageBuilder
                 .withPayload(OrderStateChangeAction.SEND).setHeader("order", order).build();
+        logger.info("日志信息: {}", sendOrderLog.createAuditLog("CodeJuzi", "Send Order", orderId));
         // 发送 Message 给Spring状态机
         if (changeStateAction(message, order)) {
             return order;
@@ -103,6 +124,7 @@ public class OrderService implements IOrderService {
         // 订单状态变更消息Message，附带订单操作RECEIVE
         Message<OrderStateChangeAction> message = MessageBuilder
                 .withPayload(OrderStateChangeAction.RECEIVE).setHeader("order", order).build();
+        logger.info("日志信息: {}", receiveOrderLog.createAuditLog("CodeJuzi", "Receive Order", orderId));
         // 发送 Message 给Spring状态机
         if (changeStateAction(message, order)) {
             return order;
